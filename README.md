@@ -1,2 +1,0 @@
-# nyzen-millitaire
-NYZEN TEST
