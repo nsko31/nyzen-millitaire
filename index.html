@@ -90,7 +90,7 @@ function showHome(){
  <div class="panel"><h2>Paramètres d'entraînement</h2><div class="setting-grid">
  <label>Mode<select data-setting="mode"><option value="training" ${prefs.mode==="training"?"selected":""}>Entraînement libre (sans chrono)</option><option value="exam" ${prefs.mode==="exam"?"selected":""}>Simulation (chrono par question)</option></select></label>
  <label>Questions par session<select data-setting="count">${[5,10,20].map(n=>`<option value="${n}" ${prefs.count===n?"selected":""}>${n} questions</option>`).join("")}</select></label></div>
- <h3 style="margin-top:19px">Secondes par question</h3><p class="small">Choisis le temps pour chaque test, de 5 à 600 secondes. Le chrono repart à zéro à chaque nouvelle question. Pour les tests à plusieurs écrans, le temps couvre la mémorisation ET la réponse.</p>
+ <h3 style="margin-top:19px">Secondes par question</h3><p class="small">Choisis le temps pour chaque test, de 5 à 600 secondes. Le chrono repart à chaque nouvelle question, et se met en pause pendant la correction. Pour les tests à plusieurs écrans, le temps couvre la mémorisation ET la réponse.</p>
  <div class="seconds-grid">${NAMES.map((n,i)=>`<label>${i+1}. ${n}<div class="row"><input type="number" inputmode="numeric" min="5" max="600" step="1" value="${prefs.secondsByTest[i]}" data-seconds="${i}" aria-label="Secondes pour ${safe(n)}"><span class="small">secondes</span></div></label>`).join("")}</div>
  <p class="small">Ces durées sont personnalisables et ne sont pas présentées comme des durées officielles.</p></div>
  <h2>Choisis ton exercice</h2><div class="grid">${NAMES.map((n,i)=>`<div class="panel exercise"><div><div class="small">TEST ${i+1}/5</div><h3>${n}</h3><p>${DESCRIPTIONS[i]}</p><p class="small">${prefs.mode==="exam"?prefs.secondsByTest[i]+" s par question":"Sans limite de temps"}</p></div><button class="primary" data-action="start" data-index="${i}">Commencer</button></div>`).join("")}</div>`;
@@ -125,7 +125,7 @@ function startTest(index){
  if(run&&run.mode==="exam"&&!run.finished){timer=setInterval(updateTimer,200);updateTimer()}
 }
 function updateTimer(){
- if(!run||run.finished||run.mode!=="exam")return;
+ if(!run||run.finished||run.mode!=="exam"||run.feedback)return;
  const remaining=(run.deadline-Date.now())/1000;
  if(remaining<=0){expireQuestion();return}
  const clock=document.getElementById("clock");
@@ -135,8 +135,9 @@ function expireQuestion(){
  if(!run||run.finished||run.mode!=="exam"||Date.now()<run.deadline)return;
  const q=run.question;
  run.answers.push({answer:null,expected:q.answer,correct:false,expired:true,explanation:q.explanation});
- run.index++;
- nextQuestion();
+ // Afficher immédiatement la correction quand le temps est écoulé.
+ run.feedback=true;
+ renderFeedback();
 }
 function nextQuestion(){
  if(!run||run.finished)return;
@@ -184,12 +185,14 @@ function submitAnswer(){
  if(run.mode==="exam"&&Date.now()>=run.deadline){expireQuestion();return}
  const correct=run.choice===run.question.answer;
  run.answers.push({answer:run.choice,expected:run.question.answer,correct,expired:false,explanation:run.question.explanation});
- if(run.mode==="training"){run.feedback=true;renderFeedback()}
- else{run.index++;nextQuestion()}
+ // Correction après CHAQUE question, même en simulation chronométrée.
+ // Le chrono reste en pause pendant la lecture de la correction.
+ run.feedback=true;
+ renderFeedback();
 }
 function renderFeedback(){
  const result=run.answers[run.answers.length-1];
- app.innerHTML=`<div class="panel"><div class="small">QUESTION ${run.index+1} / ${run.total}</div><h1>${result.correct?"Bonne réponse !":"Réponse incorrecte"}</h1><div class="feedback ${result.correct?"correct":"incorrect"}">Ta réponse : ${safe(labelAnswer(run.type,result.answer))}<br>Bonne réponse : ${safe(labelAnswer(run.type,result.expected))}</div><h3>Explication</h3><p>${safe(result.explanation)}</p><div class="bottom"><button data-action="quit">Quitter</button><button class="primary" data-action="continue">${run.index+1>=run.total?"Voir mon résultat":"Question suivante"}</button></div></div>`;
+ app.innerHTML=`<div class="panel"><div class="small">QUESTION ${run.index+1} / ${run.total}</div><h1>${result.expired?"Temps écoulé":result.correct?"Bonne réponse !":"Réponse incorrecte"}</h1><div class="feedback ${result.correct?"correct":"incorrect"}">Ta réponse : ${safe(labelAnswer(run.type,result.answer))}<br>Bonne réponse : ${safe(labelAnswer(run.type,result.expected))}</div><h3>Explication</h3><p>${safe(result.explanation)}</p><div class="bottom"><button data-action="quit">Quitter</button><button class="primary" data-action="continue">${run.index+1>=run.total?"Voir mon résultat":"Question suivante"}</button></div></div>`;
 }
 function finish(){
  if(!run||run.finished)return;run.finished=true;stopTimer();

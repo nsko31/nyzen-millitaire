@@ -1,4 +1,4 @@
-const CACHE_NAME="nyzen-militaire-par-question-v3";
+const CACHE_NAME="nyzen-militaire-par-question-v4";
 const FILES=["./","./index.html","./manifest.webmanifest"];
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting()));
