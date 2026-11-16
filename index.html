@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NYZEN Militaire">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>NYZEN MILITAIRE — Entraînement</title>
+<style>
+:root{--bg:#0b1120;--panel:#172235;--panel2:#223249;--line:#35465e;--text:#f4f7fc;--muted:#abb8ca;--blue:#83b1ff;--green:#68dcaa;--red:#ff858a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select{font:inherit}
+button{min-height:45px;padding:11px 15px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);font-weight:650;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+button.primary{background:var(--blue);color:#0a1628;border-color:var(--blue)}
+button.selected{background:#314d75;outline:2px solid var(--blue)}
+button.ghost{background:transparent}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 18px;padding-top:max(15px,env(safe-area-inset-top));border-bottom:1px solid var(--line);background:var(--bg)}
+.brand{font-weight:900;letter-spacing:.04em}.brand span{color:var(--blue)}
+main{max-width:950px;margin:auto;padding:22px 15px 65px}
+h1{font-size:clamp(27px,5vw,39px);line-height:1.15;margin:8px 0 15px}h2{font-size:23px;margin:8px 0 15px}h3{margin:8px 0}
+p{color:var(--muted)}.small{font-size:13px;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:20px;margin:15px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px}
+.exercise{display:flex;flex-direction:column;justify-content:space-between;min-height:175px}.exercise p{margin:5px 0 15px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.between{justify-content:space-between}.center{text-align:center}
+.big{font-size:clamp(35px,9vw,64px);font-weight:850;text-align:center;margin:25px 0}
+.rules{font-size:clamp(21px,5vw,29px);text-align:center;font-weight:750;line-height:1.65;padding:25px 10px}
+.rules .sep{display:block;margin:12px auto;width:75%;border-top:1px solid var(--line)}
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:17px 0}
+.choice{min-height:62px;font-size:17px}
+.word-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:25px 0}
+.word{background:var(--panel2);padding:20px 5px;border-radius:10px;text-align:center;font-size:clamp(14px,3vw,21px);font-weight:750;overflow-wrap:anywhere}
+.spatial-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:20px 0}
+.spatial-option{display:flex;flex-direction:column;align-items:center;padding:8px 5px;min-height:158px}
+.arrow-pair{background:#f7f7f2;border-radius:8px;width:100%;height:112px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.arrow-pair svg{width:48px;height:48px;display:block;flex-shrink:0}.cross{font-weight:850;font-size:18px;margin-top:5px}
+.compare{display:grid;grid-template-columns:90px 1fr;gap:12px;align-items:center;padding:14px;margin:12px 0;background:var(--panel2);border-radius:12px}
+.code-line{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:clamp(21px,5vw,33px);font-weight:800;white-space:pre;letter-spacing:.05em}
+.progress{height:8px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:14px 0}.progress div{height:100%;background:var(--blue)}
+.clock{font-size:25px;font-weight:850;color:var(--blue);font-variant-numeric:tabular-nums}.clock.urgent{color:var(--red)}
+.feedback{padding:15px;border-radius:12px;margin:15px 0}.correct{background:#164533;color:#b8ffdc}.incorrect{background:#4b2831;color:#ffcad0}
+select,input[type=number]{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px;width:100%}
+.setting-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.setting-grid label,.seconds-grid label{font-size:13px;color:var(--muted)}.setting-grid select{margin-top:5px}
+.seconds-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:12px}
+.seconds-grid label{display:flex;flex-direction:column;gap:5px;background:var(--panel2);padding:12px;border-radius:11px}
+.seconds-grid input{background:var(--panel);font-weight:800;max-width:130px}
+.bottom{display:flex;justify-content:space-between;gap:10px;margin-top:23px}.bottom button{flex:1}
+.timer-note{color:var(--muted);font-size:13px}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:20px}
+@media(max-width:550px){main{padding:17px 12px 55px}.panel{padding:15px}.setting-grid{grid-template-columns:1fr}.arrow-pair{height:102px}.arrow-pair svg{width:42px;height:42px}.spatial-option{padding:6px 3px;min-height:145px}.compare{grid-template-columns:65px 1fr;gap:7px}.code-line{letter-spacing:0}.choices{grid-template-columns:repeat(3,minmax(0,1fr))}.choice{font-size:15px;padding:8px 4px}}
+</style>
+</head>
+<body>
+<header><div class="brand">NYZEN <span>MILITAIRE</span></div><button id="homeButton" class="ghost">Accueil</button></header>
+<main id="app"></main>
+<footer>Entraînement personnel · Les durées officielles doivent être vérifiées dans les consignes de sélection.</footer>
+<script>
+"use strict";
+const app=document.getElementById("app");
+const NAMES=["Aisance numérique","Orientation spatiale","Mémoire des mots","Raisonnement","Détection d'erreurs"];
+const DESCRIPTIONS=["Calcule deux opérations mentalement, puis compare les résultats.","Mémorise deux règles puis retrouve la bonne combinaison de flèches.","Mémorise trois catégories et compte les mots correspondants.","Déduis la réponse à partir de deux phrases.","Compare deux lignes et indique le nombre d'erreurs."];
+const PREF_KEY="nyzen_militaire_preferences_v1";
+const HISTORY_KEY="nyzen_militaire_history_v1";
+function readStorage(key,fallback){try{const v=localStorage.getItem(key);return v?JSON.parse(v):fallback}catch{return fallback}}
+function writeStorage(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){console.warn("Sauvegarde indisponible",e)}}
+let prefs=readStorage(PREF_KEY,{});
+if(!prefs||typeof prefs!=="object")prefs={};
+const normalizeSeconds=v=>Math.max(5,Math.min(600,Math.round(Number(v)||30)));
+prefs={mode:prefs.mode==="exam"?"exam":"training",count:[5,10,20].includes(Number(prefs.count))?Number(prefs.count):10,secondsByTest:Array.from({length:5},(_,i)=>normalizeSeconds((Array.isArray(prefs.secondsByTest)?prefs.secondsByTest[i]:undefined)||30))};
+let history=readStorage(HISTORY_KEY,[]);
+if(!Array.isArray(history))history=[];
+let run=null,timer=null;
+const rand=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[rand(0,a.length-1)];
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=rand(0,i);[b[i],b[j]]=[b[j],b[i]]}return b}
+const safe=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function stopTimer(){if(timer!==null)clearInterval(timer);timer=null}
+const formatTime=s=>{s=Math.max(0,Math.ceil(s));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+function showHome(){
+ stopTimer();run=null;
+ const best=history.length?Math.max(...history.map(x=>Number(x.percent)||0)):0;
+ app.innerHTML=`<p class="small">PRÉPARATION PSYCHOTECHNIQUE</p><h1>Prêt pour ta sélection ?</h1><p>Entraîne-toi aux cinq exercices avec des questions renouvelées automatiquement.</p>
+ <div class="panel row between"><div><strong>${history.length} session(s)</strong><div class="small">Meilleur score : ${best}%</div></div><button data-action="history">Historique</button></div>
+ <div class="panel"><h2>Paramètres d'entraînement</h2><div class="setting-grid">
+ <label>Mode<select data-setting="mode"><option value="training" ${prefs.mode==="training"?"selected":""}>Entraînement libre (sans chrono)</option><option value="exam" ${prefs.mode==="exam"?"selected":""}>Simulation (chrono par question)</option></select></label>
+ <label>Questions par session<select data-setting="count">${[5,10,20].map(n=>`<option value="${n}" ${prefs.count===n?"selected":""}>${n} questions</option>`).join("")}</select></label></div>
+ <h3 style="margin-top:19px">Secondes par question</h3><p class="small">Choisis le temps pour chaque test, de 5 à 600 secondes. Le chrono repart à zéro à chaque nouvelle question. Pour les tests à plusieurs écrans, le temps couvre la mémorisation ET la réponse.</p>
+ <div class="seconds-grid">${NAMES.map((n,i)=>`<label>${i+1}. ${n}<div class="row"><input type="number" inputmode="numeric" min="5" max="600" step="1" value="${prefs.secondsByTest[i]}" data-seconds="${i}" aria-label="Secondes pour ${safe(n)}"><span class="small">secondes</span></div></label>`).join("")}</div>
+ <p class="small">Ces durées sont personnalisables et ne sont pas présentées comme des durées officielles.</p></div>
+ <h2>Choisis ton exercice</h2><div class="grid">${NAMES.map((n,i)=>`<div class="panel exercise"><div><div class="small">TEST ${i+1}/5</div><h3>${n}</h3><p>${DESCRIPTIONS[i]}</p><p class="small">${prefs.mode==="exam"?prefs.secondsByTest[i]+" s par question":"Sans limite de temps"}</p></div><button class="primary" data-action="start" data-index="${i}">Commencer</button></div>`).join("")}</div>`;
+}
+function showHistory(){stopTimer();run=null;let list=[...history].reverse();app.innerHTML=`<h1>Historique</h1>${list.length?list.map(h=>`<div class="panel row between"><div><strong>${safe(h.name)}</strong><div class="small">${new Date(h.date).toLocaleString("fr-BE")}</div><div class="small">${h.mode==="exam"?"Simulation":"Entraînement"} · ${h.answered??h.total}/${h.total} répondues</div></div><div style="text-align:right"><strong>${h.correct??h.score}/${h.total}</strong><div class="small">${h.percent}%</div></div></div>`).join(""):'<div class="panel"><p>Aucun résultat pour le moment.</p></div>'}<div class="row"><button class="primary" data-action="home">Retour</button>${list.length?'<button data-action="clear-history">Effacer l’historique</button>':""}</div>`}
+function operation(){const op=pick(["+","−","×"]);let a,b,value;if(op==="+"){a=rand(2,55);b=rand(2,45);value=a+b}else if(op==="−"){a=rand(15,99);b=rand(1,a-1);value=a-b}else{a=rand(2,9);b=rand(2,9);value=a*b}return{text:`${a} ${op} ${b}`,value}}
+function makeNumeric(){const first=operation();let second=operation();if(Math.random()<.23){let n=rand(0,first.value);second={text:`${n} + ${first.value-n}`,value:first.value}}return{type:"numeric",first,second,answer:first.value>second.value?"haut":first.value<second.value?"bas":"egal",explanation:`Première opération : ${first.text} = ${first.value}. Deuxième opération : ${second.text} = ${second.value}.`}}
+const DIRECTIONS={NE:{name:"DROITE HAUT",angle:45},NW:{name:"GAUCHE HAUT",angle:-45},SE:{name:"DROITE BAS",angle:135},SW:{name:"GAUCHE BAS",angle:-135}};
+const DIR_KEYS=Object.keys(DIRECTIONS);
+function makeSpatial(){
+ const [topColor,bottomColor]=shuffle(["black","yellow"]),topDir=pick(DIR_KEYS),bottomDir=pick(DIR_KEYS);
+ const good={topColor,bottomColor,topDir,bottomDir};const all=[];
+ for(const pair of [["black","yellow"],["yellow","black"]])for(const td of DIR_KEYS)for(const bd of DIR_KEYS){const x={topColor:pair[0],bottomColor:pair[1],topDir:td,bottomDir:bd};if(x.topColor===topColor&&x.bottomColor===bottomColor&&x.topDir===topDir&&x.bottomDir===bottomDir)continue;all.push(x)}
+ const wrong=shuffle(all).slice(0,5);const right=rand(0,5);let j=0;
+ const options=Array.from({length:6},(_,i)=>i===right?good:wrong[j++]);
+ const label=c=>c==="black"?"NOIR":"JAUNE";
+ return{type:"spatial",topColor,bottomColor,topDir,bottomDir,options,answer:String(right),explanation:`${label(topColor)} au-dessus de ${label(bottomColor)}. ${DIRECTIONS[topDir].name} au-dessus de ${DIRECTIONS[bottomDir].name}. Bonne combinaison : case ${right+1}.`};
+}
+function arrowSVG(color,direction){const angle=DIRECTIONS[direction].angle,fill=color==="black"?"#292e38":"#ffe349";return `<svg viewBox="0 0 80 80" aria-hidden="true"><g transform="rotate(${angle} 40 40)"><path d="M33 68 V32 H22 L40 11 L58 32 H47 V68 Z" fill="${fill}" stroke="#343944" stroke-width="2.5" stroke-linejoin="round"/></g></svg>`}
+function arrowPair(x){return `<div class="arrow-pair">${arrowSVG(x.topColor,x.topDir)}${arrowSVG(x.bottomColor,x.bottomDir)}</div>`}
+const WORDS={"Pays":["Belgique","France","Italie","Espagne","Canada","Japon","Portugal","Suisse"],"Vêtement":["Chaussettes","Chemise","Pantalon","Veste","Écharpe","Pull","Manteau","Jupe"],"Animal":["Chien","Chat","Cheval","Renard","Lapin","Lion","Zèbre","Dauphin"],"Fruit":["Pomme","Poire","Banane","Orange","Kiwi","Fraise","Mangue","Raisin"],"Métier":["Médecin","Boulanger","Pilote","Maçon","Pompier","Facteur","Infirmier","Professeur"]};
+function makeMemory(){const cats=Object.keys(WORDS),rules=Array.from({length:3},()=>pick(cats)),matches=rand(0,3),good=shuffle([0,1,2]).slice(0,matches),words=[];for(let i=0;i<3;i++){const c=good.includes(i)?rules[i]:pick(cats.filter(x=>x!==rules[i]));let w=pick(WORDS[c]);while(words.includes(w))w=pick(WORDS[c]);words.push(w)}return{type:"memory",rules,words,answer:String(matches),explanation:rules.map((r,i)=>`Position ${i+1} : ${words[i]}; catégorie attendue : ${r}.`).join(" ")}}
+const PEOPLE=["Alex","Bastien","Camille","Didier","Emma","Farah","Hugo","Inès","Jules","Lucas","Manon","Nicolas","Oscar","Sarah","Thomas"];
+const RELATIONS=[{more:"plus grand",less:"plus petit",max:"le plus grand",min:"le plus petit"},{more:"plus âgé",less:"plus jeune",max:"le plus âgé",min:"le plus jeune"},{more:"plus rapide",less:"plus lent",max:"le plus rapide",min:"le plus lent"}];
+function makeReasoning(){const [highest,middle,lowest]=shuffle(PEOPLE).slice(0,3),r=pick(RELATIONS),rev=Math.random()<.5,askHigh=Math.random()<.5;return{type:"reasoning",sentence1:rev?`${middle} est ${r.less} que ${highest}.`:`${highest} est ${r.more} que ${middle}.`,sentence2:rev?`${lowest} est ${r.less} que ${middle}.`:`${middle} est ${r.more} que ${lowest}.`,question:`Qui est ${askHigh?r.max:r.min} ?`,options:shuffle([highest,middle,lowest]),answer:askHigh?highest:lowest,explanation:`L'ordre est ${highest}, puis ${middle}, puis ${lowest} (du niveau le plus élevé au plus faible).`}}
+function makeErrors(){const letters="ABCDEFGHJKLMNPQRSTUVWXYZ",digits="0123456789",original=[pick([...letters]),pick([...letters]),pick([...letters])," ",pick([...digits]),",",pick([...digits]),pick([...digits])],copy=[...original],count=rand(0,4),positions=shuffle([0,1,2,4,6,7]).slice(0,count);for(const p of positions){const alphabet=p<3?letters:digits;copy[p]=pick([...alphabet].filter(x=>x!==original[p]))}return{type:"errors",original:original.join(""),copy:copy.join(""),answer:String(count),explanation:`${count} erreur(s). ${count?"Positions modifiées : "+positions.map(p=>p+1).sort((a,b)=>a-b).join(", ")+".":"Les deux lignes étaient identiques."}`}}
+const GENERATORS=[makeNumeric,makeSpatial,makeMemory,makeReasoning,makeErrors];
+function startTest(index){
+ stopTimer();const secs=normalizeSeconds(prefs.secondsByTest[index]);
+ run={type:index,mode:prefs.mode,total:prefs.count,seconds:secs,index:0,phase:0,choice:null,question:null,feedback:false,answers:[],finished:false,deadline:0};
+ nextQuestion();
+ if(run&&run.mode==="exam"&&!run.finished){timer=setInterval(updateTimer,200);updateTimer()}
+}
+function updateTimer(){
+ if(!run||run.finished||run.mode!=="exam")return;
+ const remaining=(run.deadline-Date.now())/1000;
+ if(remaining<=0){expireQuestion();return}
+ const clock=document.getElementById("clock");
+ if(clock){clock.textContent=formatTime(remaining);clock.classList.toggle("urgent",remaining<=5)}
+}
+function expireQuestion(){
+ if(!run||run.finished||run.mode!=="exam"||Date.now()<run.deadline)return;
+ const q=run.question;
+ run.answers.push({answer:null,expected:q.answer,correct:false,expired:true,explanation:q.explanation});
+ run.index++;
+ nextQuestion();
+}
+function nextQuestion(){
+ if(!run||run.finished)return;
+ if(run.index>=run.total){finish();return}
+ run.question=GENERATORS[run.type]();run.phase=0;run.choice=null;run.feedback=false;
+ // CHRONO PAR QUESTION : un nouveau délai est fixé pour chaque nouvelle question.
+ // Les différents écrans d'une même question partagent ce même délai.
+ run.deadline=Date.now()+run.seconds*1000;
+ renderTest();
+}
+function page(content,instruction){
+ if(!run)return;
+ const pct=run.answers.length/run.total*100;
+ app.innerHTML=`<div class="row between"><div><div class="small">QUESTION ${run.index+1} / ${run.total}</div><h1>${NAMES[run.type]}</h1></div><div class="clock" id="clock" aria-live="off">${run.mode==="exam"?formatTime((run.deadline-Date.now())/1000):"LIBRE"}</div></div><div class="progress"><div style="width:${pct}%"></div></div><p>${instruction}</p><p class="timer-note">${run.mode==="exam"?`${run.seconds} secondes par question · le chrono continue entre les écrans de cette question.`:"Mode libre · aucun temps limite."}</p><div class="panel">${content}<div class="bottom"><button class="ghost" data-action="quit">Quitter</button></div></div>`;
+ updateTimer();
+}
+const nextButton=(text="J'ai mémorisé — Suivant")=>`<div class="center"><button class="primary" data-action="advance">${text}</button></div>`;
+function choices(options){return `<div class="choices">${options.map(o=>`<button class="choice ${run.choice===String(o.value)?"selected":""}" data-action="choose" data-value="${safe(o.value)}">${safe(o.label)}</button>`).join("")}</div><div class="center"><button class="primary" data-action="submit" ${run.choice===null?"disabled":""}>Valider ma réponse</button></div>`}
+function renderTest(){
+ if(!run||run.finished)return;if(run.feedback){renderFeedback();return}
+ const q=run.question;let content="",instruction="";
+ if(q.type==="numeric"){
+  if(run.phase===0){instruction="Calcule mentalement et mémorise le résultat.";content=`<div class="small center">PREMIÈRE OPÉRATION</div><div class="big">${q.first.text}</div>${nextButton()}`}
+  else if(run.phase===1){instruction="Mémorise également le deuxième résultat.";content=`<div class="small center">DEUXIÈME OPÉRATION</div><div class="big">${q.second.text}</div>${nextButton("Comparer les deux résultats")}`}
+  else{instruction="Compare les résultats de mémoire. Les opérations ne sont plus affichées.";content=`<h2 class="center">Quel résultat est le plus grand ?</h2>${choices([{value:"haut",label:"Ligne du haut"},{value:"egal",label:"Égales"},{value:"bas",label:"Ligne du bas"}])}`}
+ }
+ if(q.type==="spatial"){
+  if(run.phase===0){instruction="Mémorise les deux règles. Elles vont disparaître.";const label=c=>c==="black"?"NOIR":"JAUNE";content=`<div class="rules"><div>${label(q.topColor)}</div><div>AU-DESSUS</div><div>${label(q.bottomColor)}</div><span class="sep"></span><div>${DIRECTIONS[q.topDir].name}</div><div>AU-DESSUS</div><div>${DIRECTIONS[q.bottomDir].name}</div></div>${nextButton("Afficher les 6 combinaisons")}`}
+  else{instruction="Choisis la seule combinaison qui respecte les deux règles.";content=`<div class="spatial-grid">${q.options.map((o,i)=>`<button class="spatial-option ${run.choice===String(i)?"selected":""}" data-action="choose" data-value="${i}" aria-label="Choisir la combinaison ${i+1}">${arrowPair(o)}<span class="cross">${run.choice===String(i)?"✕":"□"}</span></button>`).join("")}</div><div class="center"><button class="primary" data-action="submit" ${run.choice===null?"disabled":""}>Valider ma combinaison</button></div>`}
+ }
+ if(q.type==="memory"){
+  if(run.phase===0){instruction="Mémorise les trois catégories dans leur ordre.";content=`<div class="rules">${q.rules.map((r,i)=>`<div>${i+1}. ${safe(r)}</div>`).join("")}</div>${nextButton("Afficher les trois mots")}`}
+  else{instruction="Les règles ont disparu. Compte les correspondances à la bonne position.";content=`<div class="word-grid">${q.words.map(w=>`<div class="word">${safe(w)}</div>`).join("")}</div><h3 class="center">Combien de mots correspondent aux règles ?</h3>${choices([0,1,2,3].map(n=>({value:String(n),label:String(n)})))}`}
+ }
+ if(q.type==="reasoning"){instruction="Lis les deux phrases et déduis la bonne conclusion.";content=`<div class="rules" style="font-size:21px"><div>${safe(q.sentence1)}</div><br><div>${safe(q.sentence2)}</div></div><h3 class="center">${safe(q.question)}</h3>${choices(q.options.map(p=>({value:p,label:p})))}`}
+ if(q.type==="errors"){
+  if(run.phase===0){instruction="Compare chaque caractère, puis retiens combien sont différents.";content=`<div class="compare"><strong>Original</strong><div class="code-line">${safe(q.original)}</div></div><div class="compare"><strong>Copie</strong><div class="code-line">${safe(q.copy)}</div></div>${nextButton("Comparaison terminée — Suivant")}`}
+  else{instruction="Les lignes ont disparu. Indique le nombre de différences.";content=`<h2 class="center">Combien d'erreurs ?</h2>${choices([0,1,2,3,4].map(n=>({value:String(n),label:String(n)})))}`}
+ }
+ page(content,instruction);
+}
+function labelAnswer(type,val){if(val===null||val===undefined)return"Temps écoulé";if(type===0)return({haut:"Ligne du haut",egal:"Égales",bas:"Ligne du bas"})[val]||String(val);if(type===1)return`Combinaison ${Number(val)+1}`;return String(val)}
+function submitAnswer(){
+ if(!run||run.finished||run.choice===null)return;
+ if(run.mode==="exam"&&Date.now()>=run.deadline){expireQuestion();return}
+ const correct=run.choice===run.question.answer;
+ run.answers.push({answer:run.choice,expected:run.question.answer,correct,expired:false,explanation:run.question.explanation});
+ if(run.mode==="training"){run.feedback=true;renderFeedback()}
+ else{run.index++;nextQuestion()}
+}
+function renderFeedback(){
+ const result=run.answers[run.answers.length-1];
+ app.innerHTML=`<div class="panel"><div class="small">QUESTION ${run.index+1} / ${run.total}</div><h1>${result.correct?"Bonne réponse !":"Réponse incorrecte"}</h1><div class="feedback ${result.correct?"correct":"incorrect"}">Ta réponse : ${safe(labelAnswer(run.type,result.answer))}<br>Bonne réponse : ${safe(labelAnswer(run.type,result.expected))}</div><h3>Explication</h3><p>${safe(result.explanation)}</p><div class="bottom"><button data-action="quit">Quitter</button><button class="primary" data-action="continue">${run.index+1>=run.total?"Voir mon résultat":"Question suivante"}</button></div></div>`;
+}
+function finish(){
+ if(!run||run.finished)return;run.finished=true;stopTimer();
+ const answered=run.answers.filter(a=>!a.expired).length,correct=run.answers.filter(a=>a.correct).length,expired=run.answers.filter(a=>a.expired).length,percent=Math.round(correct/run.total*100);
+ const entry={name:NAMES[run.type],mode:run.mode,date:new Date().toISOString(),answered,total:run.total,correct,percent,expired,secondsPerQuestion:run.mode==="exam"?run.seconds:null};
+ history.push(entry);if(history.length>200)history=history.slice(-200);writeStorage(HISTORY_KEY,history);
+ app.innerHTML=`<div class="panel center"><div class="small">SESSION TERMINÉE</div><h1>Ton résultat</h1><div class="big">${correct}/${run.total}</div><h2>${percent}%</h2><p>${answered} questions répondues sur ${run.total}. ${expired?expired+" questions non répondues (temps écoulé).":""}</p><div class="row" style="justify-content:center"><button class="primary" data-action="restart">Recommencer</button><button data-action="home">Accueil</button></div></div><h2>Corrections</h2>${run.answers.map((a,i)=>`<div class="panel"><strong>Question ${i+1} — ${a.expired?"Temps écoulé":a.correct?"Correct":"Incorrect"}</strong><p class="small">Ta réponse : ${safe(labelAnswer(run.type,a.answer))}<br>Attendu : ${safe(labelAnswer(run.type,a.expected))}</p><p>${safe(a.explanation)}</p></div>`).join("")}`;
+}
+app.addEventListener("click",e=>{
+ const b=e.target.closest("[data-action]");if(!b)return;const action=b.dataset.action;
+ if(action==="home"){showHome();return}
+ if(action==="history"){showHistory();return}
+ if(action==="clear-history"){if(confirm("Effacer les résultats enregistrés sur cet appareil ?")){history=[];writeStorage(HISTORY_KEY,history);showHistory()}return}
+ if(action==="start"){startTest(Number(b.dataset.index));return}
+ if(action==="quit"){if(confirm("Abandonner la session en cours ?"))showHome();return}
+ if(!run||run.finished){if(action==="restart"&&run)startTest(run.type);return}
+ if(action==="advance"){if(run.mode==="exam"&&Date.now()>=run.deadline){expireQuestion();return}run.phase++;run.choice=null;renderTest();return}
+ if(action==="choose"){if(run.mode==="exam"&&Date.now()>=run.deadline){expireQuestion();return}run.choice=b.dataset.value;renderTest();return}
+ if(action==="submit"){submitAnswer();return}
+ if(action==="continue"){run.index++;nextQuestion();return}
+});
+app.addEventListener("change",e=>{
+ const field=e.target.dataset.setting;
+ if(field){prefs[field]=field==="mode"?e.target.value:Number(e.target.value);writeStorage(PREF_KEY,prefs);showHome();return}
+ const ix=e.target.dataset.seconds;
+ if(ix!==undefined){const i=Number(ix);prefs.secondsByTest[i]=normalizeSeconds(e.target.value);writeStorage(PREF_KEY,prefs);showHome()}
+});
+document.getElementById("homeButton").addEventListener("click",()=>{if(run&&!run.finished&&!confirm("Abandonner la session en cours ?"))return;showHome()});
+// Les onglets iOS peuvent être suspendus ; on vérifie alors la vraie heure au retour.
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)updateTimer()});
+if("serviceWorker" in navigator&&location.protocol!=="file:"){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(e=>console.warn("Cache hors connexion",e)))}
+showHome();
+</script>
+</body>
+</html>
